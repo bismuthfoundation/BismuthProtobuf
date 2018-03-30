@@ -9,21 +9,23 @@ import commands_pb2
 
 version_allow = "posnet0001"
 
-def version(self, handler, message):
-    if message.string_value in version_allow:
-        print ("Protocol version matched: {}".format (message.string_value))
-        handler.send_void (commands_pb2.Command.ok)
-    else:
-        print ("Protocol version mismatch: {}, should be {}".format (message.string_value, version_allow))
-        self.request.close ()
-        handler.send_void (commands_pb2.Command.notok)
-        return
+
 
 
 class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
     """Handle connections with comhandler abstraction"""
 
     def handle(self):
+        def version():
+            if message.string_value in version_allow:
+                print ("Protocol version matched: {}".format (message.string_value))
+                handler.send_void (commands_pb2.Command.ok)
+            else:
+                print ("Protocol version mismatch: {}, should be {}".format (message.string_value, version_allow))
+                self.request.close ()
+                handler.send_void (commands_pb2.Command.notok)
+                return
+
         peer_ip = self.request.getpeername ()[0]
 
         handler = comhandler.Connection (socket=self.request)
@@ -38,7 +40,7 @@ class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
 
         # message
         if message.command == commands_pb2.Command.version:
-            version(self, handler, message)
+            version()
         # message
 
         print ("Handler", handler.status ())
@@ -57,6 +59,7 @@ class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
             except Exception as e:
                 print (peer_ip, e)
                 return
+
 
 
 class ThreadedTCPServer (socketserver.ThreadingMixIn, socketserver.TCPServer):
