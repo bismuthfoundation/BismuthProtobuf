@@ -167,6 +167,7 @@ class Connection:
 
     def _send_proto(self):
         """Sends our protobuf command """
+
         data = self.protocmd.SerializeToString ()
         data_len = len (data)
         self.socket.sendall (struct.pack ('>i', data_len) + data)

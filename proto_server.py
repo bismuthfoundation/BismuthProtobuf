@@ -7,7 +7,10 @@ import socketserver, threading
 import comhandler
 import commands_pb2
 
-version_allow = "mainnet0014,mainnet0015,mainnet0016,mainnet0017"
+version_allow = "posnet0001"
+
+def message():
+    pass
 
 
 class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
@@ -20,10 +23,13 @@ class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
         print ("Handler", handler.status ())
 
         print ("Init Client")
-        message = handler.init_client ()
+
+        message = handler.init_client () #entry point
+
         print ("Handler", handler.status ())
         print (message.__str__ ())
 
+        # message
         if message.command != commands_pb2.Command.version:
             print ("Version needed")
             self.request.close ()
@@ -37,6 +43,7 @@ class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
             self.request.close ()
             handler.send_void (commands_pb2.Command.notok)
             return
+        # message
 
         print ("Handler", handler.status ())
 
@@ -51,22 +58,6 @@ class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
                 print ("Got message", message.__str__ ())
                 print ("Handler", handler.status ())
 
-                """
-
-				data = connections.receive(self.request, 10)
-
-				print("Server: Received: {} from {}".format(data, peer_ip))  # will add custom ports later
-
-				if data == 'version':
-					data = connections.receive(self.request, 10)
-					if data not in version_allow:
-						print("Protocol version mismatch: {}, should be {}".format(data, version_allow))
-						connections.send(self.request, "notok", 10)
-						return
-					else:
-						print("Inbound: Protocol version matched: {}".format(data))
-						connections.send(self.request, "ok", 10)
-				"""
             except Exception as e:
                 print (peer_ip, e)
                 return

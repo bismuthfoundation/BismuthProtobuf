@@ -20,7 +20,6 @@ message Command {
     version = 1;
     ok = 2;
     notok = 3;
-    hello = 4;
     tx = 5;
     peers = 6;
     /*
