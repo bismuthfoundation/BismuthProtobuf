@@ -194,15 +194,9 @@ class Connection:
         self.first_bytes = self.socket.recv (4)
         if len (self.first_bytes) < 4:
             raise RuntimeError ("Socket EOF")
-        if self.first_bytes == b'0000':
-            # This is legacy proto
-            self.version = VER_LEGACY
-            self.first_bytes += self.socket.recv (6)  # Get the rest of the header
-            self._get_legacy (self.first_bytes)
-        else:
-            # protobuf
-            self.version = VER_PROTO
-            self._get_proto (self.first_bytes)
+        # protobuf
+        self.version = VER_PROTO
+        self._get_proto (self.first_bytes)
         return self.protomsg
 
     def _send(self):

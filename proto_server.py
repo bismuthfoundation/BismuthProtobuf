@@ -9,8 +9,20 @@ import commands_pb2
 
 version_allow = "posnet0001"
 
-def message():
-    pass
+def version(self, handler, message):
+    if message.command != commands_pb2.Command.version:
+        print ("Version needed")
+        self.request.close ()
+        return
+
+    if message.string_value in version_allow:
+        print ("Protocol version matched: {}".format (message.string_value))
+        handler.send_void (commands_pb2.Command.ok)
+    else:
+        print ("Protocol version mismatch: {}, should be {}".format (message.string_value, version_allow))
+        self.request.close ()
+        handler.send_void (commands_pb2.Command.notok)
+        return
 
 
 class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
@@ -30,19 +42,7 @@ class ThreadedTCPRequestHandler (socketserver.BaseRequestHandler):
         print (message.__str__ ())
 
         # message
-        if message.command != commands_pb2.Command.version:
-            print ("Version needed")
-            self.request.close ()
-            return
-
-        if message.string_value in version_allow:
-            print ("Protocol version matched: {}".format (message.string_value))
-            handler.send_void (commands_pb2.Command.ok)
-        else:
-            print ("Protocol version mismatch: {}, should be {}".format (message.string_value, version_allow))
-            self.request.close ()
-            handler.send_void (commands_pb2.Command.notok)
-            return
+        version(self, handler, message)
         # message
 
         print ("Handler", handler.status ())
